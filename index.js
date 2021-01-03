@@ -21,9 +21,13 @@ app.get('/', (req, res) => {
   base_cur: INR/USD/etc
 */
 app.get('/latest', async (req, res,next) => {
-  let base_cur = 'USD'
+  let base_cur = req.query.base_cur || 'USD'
   
   try{
+
+    if(!base_cur || base_cur.length!==3){
+      throw Error("Invalid Currency");
+    }
 
     var minCacheTimestamp=getCurTimeInSeconds()-CACHE_DURATION
     let query= 'SELECT timestamp::int,lastfetched::int, base_cur,rates FROM latest WHERE base_cur=$1 AND lastfetched>$2 ORDER BY timestamp DESC LIMIT 1'
@@ -34,6 +38,7 @@ app.get('/latest', async (req, res,next) => {
       let rawRes= await fetch(`https://openexchangerates.org/api/latest.json?app_id=${OER_APP_ID}&base=${base_cur}`)
       let rawJson = await rawRes.json()
       if (!rawRes.ok) {
+        console.log(rawJson);
         throw Error(rawJson.message);
       }
 
@@ -73,10 +78,14 @@ app.get('/latest', async (req, res,next) => {
   base_cur: INR/USD/etc
 */
 app.get('/historical', async (req, res,next) => {
-  let base_cur = 'USD'
+  let base_cur = req.query.base_cur || 'USD'
   let date=req.query.date 
   
   try{
+
+    if(!base_cur || base_cur.length!==3){
+      throw Error("Invalid Currency");
+    }
 
     let query= 'SELECT id,rates FROM historical WHERE date=$1 AND base_cur=$2 LIMIT 1'
 
@@ -86,6 +95,7 @@ app.get('/historical', async (req, res,next) => {
       let rawRes= await fetch(`https://openexchangerates.org/api/historical/${date}.json?app_id=${OER_APP_ID}&base=${base_cur}`)
       let rawJson = await rawRes.json()
       if (!rawRes.ok) {
+        console.log(rawJson);
         throw Error(rawJson.message);
       }
       
