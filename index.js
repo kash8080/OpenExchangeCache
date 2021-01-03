@@ -1,6 +1,5 @@
 const express = require('express')
 const app = express()
-const port = 3000
 
 const fetch = require('node-fetch')
 
@@ -123,8 +122,8 @@ app.get('/historical', async (req, res,next) => {
 require('./src/error_handler')(app);
 
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Example app listening at port ${process.env.PORT || 3000}`)
 })
 
 function getCurTimeInSeconds(){
